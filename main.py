@@ -2,6 +2,7 @@ from PyQt6.QtCore import Qt
 from PyQt6.QtWidgets import QMainWindow, QWidget, QTextEdit, QLineEdit, QPushButton,QApplication
 import sys
 from backend import Chatbot
+import threading
 
 class ChatbotWindow(QMainWindow):
     def __init__(self):
@@ -19,6 +20,7 @@ class ChatbotWindow(QMainWindow):
         # Input Field widget
         self.input_field = QLineEdit(self)
         self.input_field.setGeometry(10,340,480,40)
+        self.input_field.returnPressed.connect(self.send_message)
 
         # Add the button
         self.button = QPushButton("Send",self)
@@ -29,11 +31,15 @@ class ChatbotWindow(QMainWindow):
 
     def send_message(self):
         user_input = self.input_field.text().strip()
-        self.chat_area.append(f"Me: {user_input}")
+        self.chat_area.append(f"Me: {user_input}\n")
         self.input_field.clear()
 
+        thread = threading.Thread(target=self.get_bot_response, args=(user_input, ))
+        thread.start()
+
+    def get_bot_response(self,user_input):
         response = self.chatbot.get_response(user_input)
-        print(response)
+        self.chat_area.append(f"Bot: {response}\n")
 
 app = QApplication(sys.argv)
 main_window = ChatbotWindow()
