@@ -32,8 +32,20 @@ class ChatbotWindow(QMainWindow):
         self.chat_area.append(f"Me: {user_input}")
         self.input_field.clear()
 
-        response = self.chatbot.get_response(user_input)
-        print(response)
+        try:
+            response = self.chatbot.get_response(user_input)
+            if response:
+                # If response is in dict format, extract the message content
+                response_text = response.get('message', "No message in response")
+                self.chat_area.append(f"Bot: {response_text}")
+                print(response_text)  # Print response to CLI for debugging
+            else:
+                self.chat_area.append("Bot: No response received.")
+                print("Error: No response from chatbot.")
+        except Exception as e:
+            self.chat_area.append(f"Error: {str(e)}")
+            print(f"Error in send_message: {e}")
+
 
 app = QApplication(sys.argv)
 main_window = ChatbotWindow()
